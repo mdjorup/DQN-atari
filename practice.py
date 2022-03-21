@@ -1,30 +1,28 @@
-import gym
 import random
 import time
+
+from gym import envs
+import gym
 # seed = 42
 
-
-# print(env.action_space)
-
-episodes = 1
+#print(envs.registry.all())
 
 
-env = gym.make('BreakoutNoFrameskip-v0')
+env = gym.make("BreakoutNoFrameskip-v4", render_mode='human')
 
 print(env.action_space)
 
-for episode in range(episodes):
-  state = env.reset()
-  done = False
-  score = 0
+episodes = 1
 
-  while not done:
-    env.render()
-    action = random.choice([0, 1, 2, 3])
-    n_state, reward, done, info  = env.step(action)
-    score += reward
-    done = True
-    time.sleep(0.5)
-  print("Episode: {}\t Score: {}".format(episode, score))
-  print(type(n_state))
+for episode in range(episodes):
+    state = env.reset()
+    done = False
+    score = 0
+    while not done:
+        action = env.action_space.sample()
+        n_state, reward, done, info = env.step(action)
+        score += reward
+        time.sleep(.1)
+    print("Episode: {}\t Score: {}".format(episode, score))
+    
 env.close()
