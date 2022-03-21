@@ -34,24 +34,28 @@
 # converted2 = tf.image.rgb_to_grayscale(test_images)
 
 
-
-def convert_grayscale(image):
-  return tf.image.rgb_to_grayscale(image)
-
-
-def reshape(image, new_shape):
-  pass
+# grayscale: tf.image.rgb_to_grayscale(images)
+# resize: tf.image.resize(images)
+# crop: indexing
+import numpy as np
+import tensorflow as tf
 
 
-def crop_to_playing_area(image):
-  pass
-
-
-def process_single_image(image):
-  return crop_to_playing_area(reshape(convert_grayscale(image), (110, 84)))
-# if images length is less than the desired amount, then it needs to repeat images
+def prepare(images, length=4):
+  if len(images) == length:
+    return images
+  im_length = len(images)
+  short = length - im_length
+  app_arr = np.repeat([images[-1]], 2, axis=0)
+  return np.append(images, app_arr, axis=0)
 
 
 def phi(images, length=4):
+  new_images = prepare(images, length)
+  grayscale = tf.image.rgb_to_grayscale(new_images)
+  resize = tf.image.resize(grayscale, [110, 84])
+  cropped = tf.image.crop_to_bounding_box(resize, 17, 0, 84, 84)
+  return cropped
+  
 
-  pass
+  
