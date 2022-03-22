@@ -13,12 +13,14 @@ class StateProcessor:
 
     def __init__(self, initial_frame, length=4):
         x = process_single_frame(initial_frame)
-        self.state = np.repeat([x], 4, axis=0)
+        self.state = np.repeat([x], length, axis=0)
 
 
     def insert_frame(self, frame):
         x = process_single_frame(frame)
         appended = np.append(self.state, [x], axis=0)
         self.state = np.remove(appended, 0, 0)
-
     
+
+    def get_state(self):
+        return self.state
