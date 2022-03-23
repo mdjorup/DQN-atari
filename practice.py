@@ -1,16 +1,14 @@
 import random
 import time
 
-from gym import envs
 import gym
 
 import numpy as np
 
 import cv2
 
-from PIL import Image
-
 import tensorflow as tf
+import state
 # seed = 42
 
 #print(envs.registry.all())
@@ -18,11 +16,39 @@ import tensorflow as tf
 
 env = gym.make("BreakoutNoFrameskip-v4", render_mode='rgb_array')
 
-print(env.action_space)
-print(env.action_space.n)
+print(env.unwrapped.get_action_meanings())
+
+initial_frame = env.reset()
+
+sp = state.StateProcessor(initial_frame)
+
+images = []
+
+for _ in range(4):
+    new_frame, reward, done, info = env.step(2)
+    print(new_frame.shape)
+    images.append(new_frame)
+
+images = np.array(images)
+
+print("images shape", images.shape)
+sp.insert_frames(images)
+
+print(sp.get_state().shape)
+curr_state = sp.get_state()
+
+cv2.imshow("channel0", curr_state[:,:,0])
+cv2.imshow("channel1", curr_state[:,:,1])
+cv2.imshow("channel2", curr_state[:,:,2])
+cv2.imshow("channel3", curr_state[:,:,3])
+
+key = cv2.waitKey(20000)#pauses for 15 seconds before fetching next image
+if key == 27:#if ESC is pressed, exit loop
+    cv2.destroyAllWindows()
+
+
 
 episodes = 1
-
 # for episode in range(episodes):
 #     state = env.reset()
 #     done = False

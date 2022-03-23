@@ -37,7 +37,7 @@ epsilon = max_epsilon
 batch_sample_size = 32
 
 #1. Define environment
-env = gym.make("BreakoutNoFrameskip-v4")
+env = gym.make("BreakoutNoFrameskip-v4", render_mode="rgb_array")
 num_actions = env.action_space.n
 
 #2. Initialize replay memory
@@ -81,6 +81,7 @@ while True:
             rewards += reward
             #update total frame count
             frame += 1
+            episode_frames += 1
             # if done, can't go more so stop iterating
             if done:
                 break
@@ -111,7 +112,17 @@ while True:
 
         # Network updates if we are past the random state
         if frame >= random_frames:
+            # sample a mini batch of transitions - all are in the form of a list
             initial_state_samples, action_samples, reward_samples, next_state_samples, done_samples = memory.sample(batch_sample_size)
+
+            #This stores the expected rewards for each state transition - 
+            #   = r if transition is terminal
+            #   = r + gQ*(next state, a', theta)  --> basically passing the next state through the network and getting the max action value
+            # should be an array of action values
+            y = []
+
+            # gradient descent - Loss = difference between y and passing initial state through the same network
+            
 
 
 
@@ -136,23 +147,6 @@ while True:
     if sum(episode_rewards) / len(episode_rewards) > 40:
         break
 
-        
-    #exit condition
-
-
-
-# macros
-
-
-
-#logic 
-# We have initial image x
-# We need to turn image x into s0 in initialization
-# We get new image
-    # Need to process image
-    # Add it to s
-    #remove first x in s
-    #now we have s1
 
 
 
