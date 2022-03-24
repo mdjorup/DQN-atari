@@ -1,7 +1,8 @@
+from turtle import ycor
 import numpy as np
 import tensorflow as tf
 from keras.losses import MeanSquaredError
-from keras.optimizers import Adam
+from tensorflow.keras.optimizers import Adam
 
 import gym
 
@@ -58,10 +59,15 @@ model = build_model((84, 84, 4), num_actions)
 target_model = build_model((84, 84, 4), num_actions)
 
 
+episode = 0
+episode_rewards = []
+
 while True:
-    episode_rewards = []
+    
     episode_reward = 0
     episode_frames = 0
+
+    episode += 1
 
     initial_image = env.reset()
 
@@ -161,41 +167,54 @@ while True:
 
             y = reward_samples + gamma * max_q
 
+            
+            # mask to indicate correct indexes to collect the action values
+            masks = tf.one_hot(action_samples, 4)
 
-            # getting our predicted qs from initial state
-            # run the initial states through the network
-            prev_predictions = target_model.predict(initial_state_samples)
-            # select the q values corresponding to the action that was taken
-            prev_q = prev_predictions[np.arange(len(prev_predictions)), action_samples] #output is 1-d
-
+            
             with tf.GradientTape() as tape:
 
-                current_loss = loss_function(y, prev_q) 
+                #train the model on the initial states
+                prev_predictions = model(initial_state_samples)
+
+                #get all of the action values for the actions that were taken
+                prev_actions = tf.reduce_sum(tf.multiply(prev_predictions, masks), axis=1)
+
+                # compute the loss
+                current_loss = loss_function(y, prev_actions) 
 
             grads = tape.gradient(current_loss, model.trainable_variables)
             
             optimizer.apply_gradients(zip(grads, model.trainable_variables))
+
+            quit()
                     
     
         #break conditions
         if done or episode_frames >= max_frames_per_episode:
             break
 
-    
+    #whenever an episode is completed, update the target model
     target_model.set_weights(model.get_weights())
-
     
-    #exit big loop conditions
-
-    if frame >= max_frames:
-        break
 
     episode_rewards.append(episode_reward)
     if len(episode_rewards) > 100:
         episode_rewards.pop(0)
 
-    if sum(episode_rewards) / len(episode_rewards) > 40:
+    avg_episode_reward = np.mean(episode_rewards)
+
+    print("Got to episode {}, frames: {}, Average Episode Reward: {}".format(episode, frame, avg_episode_reward), end='\r')
+
+    if avg_episode_reward > 40:
         break
+
+    if frame >= max_frames:
+        break
+
+print("Average episode reward after training: {}".format(avg_episode_reward))
+
+    
 
 
 
