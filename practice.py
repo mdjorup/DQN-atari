@@ -18,33 +18,41 @@ env = gym.make("BreakoutNoFrameskip-v4", render_mode='rgb_array')
 
 print(env.unwrapped.get_action_meanings())
 
-initial_frame = env.reset()
+a = np.array([[1, 2, 3, 4],
+              [0, 1, 2, 3],
+              [10, 11, 12, 13]])
 
-sp = state.StateProcessor(initial_frame)
+b = [3, 3, 3]
 
-images = []
+print(a[np.arange(len(a)), b])
 
-for _ in range(4):
-    new_frame, reward, done, info = env.step(2)
-    print(new_frame.shape)
-    images.append(new_frame)
+# initial_frame = env.reset()
 
-images = np.array(images)
+# sp = state.StateProcessor(initial_frame)
 
-print("images shape", images.shape)
-sp.insert_frames(images)
+# images = []
 
-print(sp.get_state().shape)
-curr_state = sp.get_state()
+# for _ in range(4):
+#     new_frame, reward, done, info = env.step(2)
+#     print(new_frame.shape)
+#     images.append(new_frame)
 
-cv2.imshow("channel0", curr_state[:,:,0])
-cv2.imshow("channel1", curr_state[:,:,1])
-cv2.imshow("channel2", curr_state[:,:,2])
-cv2.imshow("channel3", curr_state[:,:,3])
+# images = np.array(images)
 
-key = cv2.waitKey(20000)#pauses for 15 seconds before fetching next image
-if key == 27:#if ESC is pressed, exit loop
-    cv2.destroyAllWindows()
+# print("images shape", images.shape)
+# sp.insert_frames(images)
+
+# print(sp.get_state().shape)
+# curr_state = sp.get_state()
+
+# cv2.imshow("channel0", curr_state[:,:,0])
+# cv2.imshow("channel1", curr_state[:,:,1])
+# cv2.imshow("channel2", curr_state[:,:,2])
+# cv2.imshow("channel3", curr_state[:,:,3])
+
+# key = cv2.waitKey(20000)#pauses for 15 seconds before fetching next image
+# if key == 27:#if ESC is pressed, exit loop
+#     cv2.destroyAllWindows()
 
 
 

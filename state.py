@@ -22,6 +22,8 @@ class StateProcessor:
 
 
     def insert_frames(self, frames):
+        if len(frames) != 4: # if we don't get a valid input (meaning the state is done) just keep the state as the previous state
+            return
         initial_frames = np.reshape(frames, (-1, 210, 160, 3))
         processed = process_frames(initial_frames)
         self.state = processed
