@@ -93,14 +93,11 @@ while True:
 
         # Get the current state of the environment
         prev_state = state_processor.get_state()
-        frames_to_add = []
         rewards = 0
         # update the environment 4 times, taking the same action for 4 frames
         for _ in range(update_interval):
             # update environment
             new_frame, reward, done, info = env.step(action)
-            #add new frame to the frames to add
-            frames_to_add.append(new_frame)
             #accumilate rewards
             rewards += reward
             #update total frame count
@@ -121,10 +118,8 @@ while True:
 
         episode_reward += reward
 
-        # Need to make this into a numpy array for the processing
-        frames_to_add = np.array(frames_to_add)
         #insert a frame into the state processor - this frame is 4 frames in the future from the previous frame
-        state_processor.insert_frames(frames_to_add)
+        state_processor.insert_frame(new_frame)
 
         #get the new state from the state processor
         new_state = state_processor.get_state()
