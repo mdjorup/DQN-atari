@@ -1,9 +1,10 @@
-from turtle import ycor
 import numpy as np
 import tensorflow as tf
 from keras.losses import MeanSquaredError
 from tensorflow.keras.optimizers import Adam
 
+
+import os
 import gym
 
 import replay_memory
@@ -54,9 +55,20 @@ memory = replay_memory.ReplayMemory(40000)
 
 #3. Create neural nework 
 
-model = build_model((84, 84, 4), num_actions)
+load_prev = False
 
+checkpoint_path = "checkpoints/cp-{epoch:07d}.ckpt"
+checkpoint_dir = os.path.dirname(checkpoint_path)
+
+model = build_model((84, 84, 4), num_actions)
 target_model = build_model((84, 84, 4), num_actions)
+
+if load_prev:
+    model.load_weights('./checkpoints/cp-0000')
+    target_model.load_weights('./checkpoints/cp-0000')
+
+
+episodes_per_epoch = 20
 
 
 episode = 0
@@ -181,8 +193,6 @@ while True:
             grads = tape.gradient(current_loss, model.trainable_variables)
             
             optimizer.apply_gradients(zip(grads, model.trainable_variables))
-
-            quit()
                     
     
         #break conditions
@@ -191,6 +201,12 @@ while True:
 
     #whenever an episode is completed, update the target model
     target_model.set_weights(model.get_weights())
+
+
+    # when to checkpoint model
+    if episode % episodes_per_epoch == 0:
+        target_model.save_weights(checkpoint_path.format(epoch=episode))
+        
     
 
     episode_rewards.append(episode_reward)
